@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucky Twins 雙胞胎禮物認領表</title>
+  <style>
+    :root {
+      --bg: #fff8f3;
+      --card: #ffffff;
+      --main: #d8896f;
+      --main-dark: #b86b55;
+      --text: #3b302c;
+      --muted: #8b7a73;
+      --line: #ead8cf;
+      --green: #3c9d75;
+      --yellow: #e0a33a;
+      --red: #d76565;
+      --blue: #4c7fb8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(180deg, #fff8f3 0%, #fff1e8 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 28px 16px 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 10px auto 0;
+      max-width: 720px;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(150, 95, 75, 0.08);
+      margin-bottom: 16px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 180px 130px;
+      gap: 10px;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 84px;
+    }
+
+    button {
+      background: var(--main);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover { background: var(--main-dark); }
+
+    button.secondary {
+      background: #f4e3da;
+      color: var(--main-dark);
+    }
+
+    button.ghost {
+      background: transparent;
+      color: var(--main-dark);
+      border: 1px solid var(--line);
+    }
+
+    button.danger {
+      background: var(--red);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 22px;
+    }
+
+    .stat span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .category-section {
+      margin-bottom: 18px;
+    }
+
+    .category-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 12px 0 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .category-title small {
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    .gift-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .gift-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .gift-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(150, 95, 75, 0.12);
+    }
+
+    .gift-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .gift-name {
+      font-weight: 800;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .gift-spec {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .gift-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .need { background: #fff2d7; color: #9a6412; }
+    .claimed { background: #e6f7ef; color: #247558; }
+    .partial { background: #edf4ff; color: #3d6fa8; }
+    .urgent { background: #ffe4e4; color: #b54040; }
+    .suggest { background: #f0eaff; color: #6550a8; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .claim-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .selected-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .selected-card h2 {
+      margin: 0 0 8px;
+    }
+
+    .form-row {
+      margin-bottom: 12px;
+    }
+
+    .form-row label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .history {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .history-item {
+      background: #fffaf6;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 30px 10px;
+      background: #fff;
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+    }
+
+    .notice {
+      line-height: 1.6;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .firebase-warning {
+      display: none;
+      border: 1px dashed var(--red);
+      background: #fff6f6;
+      color: #7b2d2d;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 120px 140px 140px;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .admin-list {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #fff1e8;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .inline-actions button {
+      padding: 8px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 780px) {
+      h1 { font-size: 24px; }
+      .toolbar, .stats, .gift-grid, .claim-layout, .admin-grid {
+        grid-template-columns: 1fr;
+      }
+      .container { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎁 Lucky Twins 雙胞胎禮物認領表</h1>
+    <p>謝謝大家的心意！這裡列出目前比較需要的物資，點選想認領的品項後，可以填入名字、數量與備註，避免大家重複購買。</p>
+  </header>
+
+  <main class="container">
+    <div id="firebaseWarning" class="firebase-warning">
+      ⚠️ Firebase 尚未正常連線。請確認 Firestore Database 已開啟，且安全規則允許讀寫。
+    </div>
+
+    <section id="listPage" class="page active">
+      <div class="panel">
+        <div class="toolbar">
+          <input id="searchInput" placeholder="搜尋物資，例如：尿布、嬰兒床、安全座椅" />
+          <select id="statusFilter">
+            <option value="全部">全部狀態</option>
+            <option value="尚可認領">尚可認領</option>
+            <option value="部分認領">部分認領</option>
+            <option value="已額滿">已額滿</option>
+          </select>
+          <button class="secondary" id="adminBtn">管理員</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><b id="totalItems">0</b><span>需要物資</span></div>
+          <div class="stat"><b id="openItems">0</b><span>尚可認領</span></div>
+          <div class="stat"><b id="partialItems">0</b><span>部分認領</span></div>
+          <div class="stat"><b id="doneItems">0</b><span>已額滿</span></div>
+        </div>
+      </div>
+
+      <div id="giftList"></div>
+    </section>
+
+    <section id="claimPage" class="page">
+      <div class="panel">
+        <button class="ghost" id="backBtn">← 返回物資列表</button>
+      </div>
+
+      <div class="claim-layout">
+        <div class="selected-card">
+          <div id="selectedGiftInfo"></div>
+          <div class="history">
+            <b>目前認領紀錄</b>
+            <div id="claimHistory"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 style="margin-top:0;">填寫認領資料</h2>
+
+          <div class="form-row">
+            <label>你的名字</label>
+            <input id="claimerName" placeholder="例如：Amy / 小美 / 姑姑" />
+          </div>
+
+          <div class="form-row">
+            <label>認領數量</label>
+            <input id="claimQty" type="number" min="1" value="1" />
+          </div>
+
+          <div class="form-row">
+            <label>品項 / 備註</label>
+            <textarea id="claimNote" placeholder="例如：我會買 Pampers NB 一包 / 我買第二台安全座椅 / 我買白色包巾兩條"></textarea>
+          </div>
+
+          <button id="submitClaimBtn">送出認領</button>
+          <p class="notice">送出後會即時同步，其他朋友打開同一個網站也會看到最新狀態。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="adminLoginPage" class="page">
+      <div class="panel">
+        <button class="ghost" id="adminBackBtn">← 返回物資列表</button>
+      </div>
+      <div class="panel" style="max-width:520px;margin:0 auto 16px;">
+        <h2 style="margin-top:0;">管理員登入</h2>
+        <p class="notice">請輸入管理員密碼，登入後可新增、修改、刪除品項。</p>
+        <div class="form-row">
+          <label>密碼</label>
+          <input id="adminPassword" type="password" placeholder="請輸入密碼" />
+        </div>
+        <button id="adminLoginBtn">登入管理員</button>
+      </div>
+    </section>
+
+    <section id="adminPage" class="page">
+      <div class="panel">
+        <div class="toolbar">
+          <button class="ghost" id="adminHomeBtn">← 返回物資列表</button>
+          <button class="secondary" id="adminLogoutBtn">登出管理員</button>
+          <button class="danger" id="resetSeedBtn">補齊預設品項</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 style="margin-top:0;">新增品項</h2>
+        <div class="admin-grid">
+          <input id="adminCategory" placeholder="類別，例如：外出大型用品" />
+          <input id="adminName" placeholder="品項名稱" />
+          <input id="adminSpec" placeholder="規格 / 備註" />
+          <input id="adminQty" type="number" min="1" value="1" />
+          <select id="adminPriority">
+            <option value="必需">必需</option>
+            <option value="建議">建議</option>
+          </select>
+          <button id="adminAddBtn">新增</button>
+        </div>
+      </div>
+
+      <div class="panel admin-list">
+        <h2 style="margin-top:0;">管理品項</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>類別</th>
+              <th>品項</th>
+              <th>備註</th>
+              <th>需要數量</th>
+              <th>優先度</th>
+              <th>已認領</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="adminTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      addDoc,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot,
+      serverTimestamp,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+    const ADMIN_PASSWORD = "ChipDale";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDNFWpCF9U6U700g75oLWESLFnxWx1o7nY",
+      authDomain: "luckytwinsgift.firebaseapp.com",
+      projectId: "luckytwinsgift",
+      storageBucket: "luckytwinsgift.firebasestorage.app",
+      messagingSenderId: "1043956743290",
+      appId: "1:1043956743290:web:8e9dda51fb462d1b0bcfc3"
+    };
+
+    const COLLECTION_ITEMS = "needed_gift_items";
+    const COLLECTION_CLAIMS = "gift_claims";
+
+    const neededItems = [
+      { category: "外出大型用品", name: "安全座椅", spec: "雙胞胎外出必備，可認領第二台或指定款式", targetQty: 1, priority: "必需" },
+      { category: "睡眠用品", name: "嬰兒床", spec: "可先1張，之後視情況增加", targetQty: 1, priority: "必需" },
+      { category: "睡眠用品", name: "床墊", spec: "搭配嬰兒床使用", targetQty: 1, priority: "必需" },
+      { category: "睡眠用品", name: "防水尿墊", spec: "床上、尿布台、外出可輪替", targetQty: 4, priority: "必需" },
+      { category: "尿布與消耗品", name: "尿布", spec: "雙胞胎用量大，尺寸可先以NB/S為主", targetQty: 8, priority: "必需" },
+      { category: "外出大型用品", name: "推車", spec: "若已有單人推車，可認領雙人推車或配件", targetQty: 1, priority: "建議" },
+      { category: "尿布與消耗品", name: "紙尿布", spec: "原 NB紙尿布 改名為紙尿布，可分批認領", targetQty: 8, priority: "必需" },
+      { category: "尿布與消耗品", name: "純水濕紙巾", spec: "大包或小包都可以", targetQty: 10, priority: "必需" },
+      { category: "清潔用品", name: "口水巾補充", spec: "建議再補8–12條", targetQty: 10, priority: "必需" },
+      { category: "清潔用品", name: "奶瓶清潔液", spec: "建議2–3瓶", targetQty: 2, priority: "必需" },
+      { category: "清潔用品", name: "奶瓶刷", spec: "建議至少2支", targetQty: 2, priority: "必需" },
+      { category: "餵奶用品", name: "奶瓶奶嘴頭補充", spec: "建議再補6–10個", targetQty: 8, priority: "必需" },
+      { category: "餵奶用品", name: "消毒烘乾鍋", spec: "建議大容量，雙胞胎奶瓶多", targetQty: 1, priority: "必需" },
+      { category: "餵奶用品", name: "溫奶器", spec: "雙胞胎夜奶會方便很多", targetQty: 1, priority: "建議" },
+      { category: "睡眠用品", name: "包巾 / 包被", spec: "雙胞胎建議6–8條", targetQty: 6, priority: "必需" },
+      { category: "外出大型用品", name: "媽媽包 / 雙胞胎外出包", spec: "容量要大，分隔多更方便", targetQty: 1, priority: "建議" },
+      { category: "洗澡用品", name: "嬰兒澡盆", spec: "可摺疊更省空間", targetQty: 1, priority: "必需" },
+      { category: "洗澡用品", name: "紗布澡巾", spec: "洗澡、擦臉都可用", targetQty: 8, priority: "建議" },
+      { category: "醫療用品", name: "體溫計", spec: "耳溫槍或額溫槍", targetQty: 1, priority: "必需" },
+      { category: "醫療用品", name: "吸鼻器", spec: "新生兒鼻塞很常用", targetQty: 1, priority: "必需" },
+      { category: "醫療用品", name: "生理食鹽水", spec: "鼻塞清潔用", targetQty: 2, priority: "建議" },
+      { category: "媽媽用品", name: "產褥墊", spec: "產後住院 / 月中用", targetQty: 2, priority: "必需" },
+      { category: "媽媽用品", name: "哺乳睡衣", spec: "建議2–4套", targetQty: 2, priority: "建議" },
+      { category: "玩具安撫", name: "白噪音機", spec: "雙胞胎睡眠很實用", targetQty: 1, priority: "建議" }
+    ];
+
+    let db;
+    let items = [];
+    let claims = [];
+    let selectedItemId = null;
+    let isAdmin = sessionStorage.getItem("luckyTwinsAdmin") === "yes";
+
+    const el = {
+      warning: document.getElementById("firebaseWarning"),
+      listPage: document.getElementById("listPage"),
+      claimPage: document.getElementById("claimPage"),
+      adminLoginPage: document.getElementById("adminLoginPage"),
+      adminPage: document.getElementById("adminPage"),
+      giftList: document.getElementById("giftList"),
+      search: document.getElementById("searchInput"),
+      statusFilter: document.getElementById("statusFilter"),
+      totalItems: document.getElementById("totalItems"),
+      openItems: document.getElementById("openItems"),
+      partialItems: document.getElementById("partialItems"),
+      doneItems: document.getElementById("doneItems"),
+      backBtn: document.getElementById("backBtn"),
+      selectedGiftInfo: document.getElementById("selectedGiftInfo"),
+      claimHistory: document.getElementById("claimHistory"),
+      claimerName: document.getElementById("claimerName"),
+      claimQty: document.getElementById("claimQty"),
+      claimNote: document.getElementById("claimNote"),
+      submitClaimBtn: document.getElementById("submitClaimBtn"),
+      adminBtn: document.getElementById("adminBtn"),
+      adminBackBtn: document.getElementById("adminBackBtn"),
+      adminPassword: document.getElementById("adminPassword"),
+      adminLoginBtn: document.getElementById("adminLoginBtn"),
+      adminHomeBtn: document.getElementById("adminHomeBtn"),
+      adminLogoutBtn: document.getElementById("adminLogoutBtn"),
+      adminCategory: document.getElementById("adminCategory"),
+      adminName: document.getElementById("adminName"),
+      adminSpec: document.getElementById("adminSpec"),
+      adminQty: document.getElementById("adminQty"),
+      adminPriority: document.getElementById("adminPriority"),
+      adminAddBtn: document.getElementById("adminAddBtn"),
+      adminTable: document.getElementById("adminTable"),
+      resetSeedBtn: document.getElementById("resetSeedBtn")
+    };
+
+    function showPage(pageEl) {
+      [el.listPage, el.claimPage, el.adminLoginPage, el.adminPage].forEach(p => p.classList.remove("active"));
+      pageEl.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function slugify(text) {
+      return String(text)
+        .replace(/[\s\/]+/g, "_")
+        .replace(/[^一-龥a-zA-Z0-9_]/g, "")
+        .slice(0, 40);
+    }
+
+    function getItemClaims(itemId) {
+      return claims.filter(c => c.itemId === itemId);
+    }
+
+    function claimedQty(itemId) {
+      return getItemClaims(itemId).reduce((sum, c) => sum + Number(c.quantity || 0), 0);
+    }
+
+    function getStatus(item) {
+      const qty = claimedQty(item.id);
+      if (qty <= 0) return "尚可認領";
+      if (qty < Number(item.targetQty || 1)) return "部分認領";
+      return "已額滿";
+    }
+
+    function statusBadge(status) {
+      if (status === "已額滿") return "claimed";
+      if (status === "部分認領") return "partial";
+      return "need";
+    }
+
+    function priorityBadge(priority) {
+      if (priority === "必需") return "urgent";
+      return "suggest";
+    }
+
+    function filteredItems() {
+      const keyword = el.search.value.trim().toLowerCase();
+      const status = el.statusFilter.value;
+
+      return items.filter(item => {
+        const itemStatus = getStatus(item);
+        const text = `${item.category} ${item.name} ${item.spec} ${item.priority}`.toLowerCase();
+        const matchKeyword = !keyword || text.includes(keyword);
+        const matchStatus = status === "全部" || itemStatus === status;
+        return matchKeyword && matchStatus;
+      });
+    }
+
+    function renderStats() {
+      el.totalItems.textContent = items.length;
+      el.openItems.textContent = items.filter(i => getStatus(i) === "尚可認領").length;
+      el.partialItems.textContent = items.filter(i => getStatus(i) === "部分認領").length;
+      el.doneItems.textContent = items.filter(i => getStatus(i) === "已額滿").length;
+    }
+
+    function renderList() {
+      renderStats();
+
+      const list = filteredItems();
+      if (!list.length) {
+        el.giftList.innerHTML = `<div class="empty">目前沒有符合條件的物資</div>`;
+        return;
+      }
+
+      const grouped = list.reduce((acc, item) => {
+        acc[item.category] = acc[item.category] || [];
+        acc[item.category].push(item);
+        return acc;
+      }, {});
+
+      el.giftList.innerHTML = Object.entries(grouped).map(([category, group]) => `
+        <section class="category-section panel">
+          <div class="category-title">
+            <span>${escapeHtml(category)}</span>
+            <small>${group.length} 個品項</small>
+          </div>
+          <div class="gift-grid">
+            ${group.map(item => {
+              const qty = claimedQty(item.id);
+              const status = getStatus(item);
+              const remain = Math.max(Number(item.targetQty || 1) - qty, 0);
+              return `
+                <div class="gift-card" onclick="window.openClaimPage('${item.id}')">
+                  <div class="gift-top">
+                    <div>
+                      <div class="gift-name">${escapeHtml(item.name)}</div>
+                      <div class="gift-spec">${escapeHtml(item.spec)}</div>
+                    </div>
+                    <span class="badge ${statusBadge(status)}">${status}</span>
+                  </div>
+                  <div class="gift-meta">
+                    <span class="badge ${priorityBadge(item.priority)}">${escapeHtml(item.priority)}</span>
+                    <span class="badge need">需要 ${Number(item.targetQty || 1)}</span>
+                    <span class="badge partial">已認領 ${qty}</span>
+                    <span class="badge ${remain === 0 ? "claimed" : "need"}">尚缺 ${remain}</span>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `).join("");
+    }
+
+    function renderClaimPage() {
+      const item = items.find(i => i.id === selectedItemId);
+      if (!item) return;
+
+      const itemClaims = getItemClaims(item.id);
+      const qty = claimedQty(item.id);
+      const remain = Math.max(Number(item.targetQty || 1) - qty, 0);
+      const status = getStatus(item);
+
+      el.selectedGiftInfo.innerHTML = `
+        <h2>${escapeHtml(item.name)}</h2>
+        <p class="notice">${escapeHtml(item.spec)}</p>
+        <div class="gift-meta">
+          <span class="badge ${priorityBadge(item.priority)}">${escapeHtml(item.priority)}</span>
+          <span class="badge ${statusBadge(status)}">${status}</span>
+          <span class="badge need">需要 ${Number(item.targetQty || 1)}</span>
+          <span class="badge partial">已認領 ${qty}</span>
+          <span class="badge ${remain === 0 ? "claimed" : "need"}">尚缺 ${remain}</span>
+        </div>
+      `;
+
+      el.claimQty.max = remain || Number(item.targetQty || 1);
+      el.claimQty.value = remain > 0 ? 1 : 0;
+      el.claimNote.value = item.name;
+
+      if (!itemClaims.length) {
+        el.claimHistory.innerHTML = `<div class="empty">目前還沒有人認領</div>`;
+      } else {
+        el.claimHistory.innerHTML = itemClaims.map(c => `
+          <div class="history-item">
+            <b>${escapeHtml(c.claimerName)}</b> 認領 <b>${Number(c.quantity || 0)}</b> 份<br>
+            <span>${escapeHtml(c.note || "-")}</span>
+            ${isAdmin ? `<br><button class="danger" style="margin-top:8px;width:auto;padding:7px 10px;" onclick="window.adminDeleteClaim('${c.id}')">刪除此認領</button>` : ""}
+          </div>
+        `).join("");
+      }
+
+      el.submitClaimBtn.disabled = remain === 0;
+      el.submitClaimBtn.textContent = remain === 0 ? "此品項已額滿" : "送出認領";
+    }
+
+    function renderAdminTable() {
+      if (!isAdmin) return;
+
+      el.adminTable.innerHTML = items.map(item => {
+        const qty = claimedQty(item.id);
+        return `
+          <tr>
+            <td><input value="${escapeHtml(item.category)}" onchange="window.adminUpdateItem('${item.id}', {category: this.value})"></td>
+            <td><input value="${escapeHtml(item.name)}" onchange="window.adminUpdateItem('${item.id}', {name: this.value})"></td>
+            <td><input value="${escapeHtml(item.spec)}" onchange="window.adminUpdateItem('${item.id}', {spec: this.value})"></td>
+            <td><input type="number" min="1" value="${Number(item.targetQty || 1)}" onchange="window.adminUpdateItem('${item.id}', {targetQty: Number(this.value)})"></td>
+            <td>
+              <select onchange="window.adminUpdateItem('${item.id}', {priority: this.value})">
+                <option value="必需" ${item.priority === "必需" ? "selected" : ""}>必需</option>
+                <option value="建議" ${item.priority === "建議" ? "selected" : ""}>建議</option>
+              </select>
+            </td>
+            <td>${qty}</td>
+            <td>
+              <div class="inline-actions">
+                <button class="danger" onclick="window.adminDeleteItem('${item.id}')">刪除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderAll() {
+      renderList();
+      renderAdminTable();
+      if (selectedItemId) renderClaimPage();
+    }
+
+    window.openClaimPage = (id) => {
+      selectedItemId = id;
+      showPage(el.claimPage);
+      renderClaimPage();
+    };
+
+    function backToList() {
+      selectedItemId = null;
+      showPage(el.listPage);
+    }
+
+    async function submitClaim() {
+      const item = items.find(i => i.id === selectedItemId);
+      if (!item) return;
+
+      const name = el.claimerName.value.trim();
+      const quantity = Number(el.claimQty.value || 0);
+      const note = el.claimNote.value.trim();
+
+      if (!name) {
+        alert("請填入你的名字");
+        return;
+      }
+
+      if (!quantity || quantity < 1) {
+        alert("請填入正確數量");
+        return;
+      }
+
+      const remain = Math.max(Number(item.targetQty || 1) - claimedQty(item.id), 0);
+      if (quantity > remain) {
+        alert(`目前最多只能認領 ${remain} 份`);
+        return;
+      }
+
+      await addDoc(collection(db, COLLECTION_CLAIMS), {
+        itemId: item.id,
+        itemName: item.name,
+        category: item.category,
+        claimerName: name,
+        quantity,
+        note,
+        createdAt: serverTimestamp()
+      });
+
+      alert("已成功送出認領，謝謝你！");
+      el.claimerName.value = "";
+      el.claimQty.value = 1;
+      el.claimNote.value = "";
+      backToList();
+    }
+
+    async function seedItemsUnused() {
+      for (let i = 0; i < neededItems.length; i++) {
+        const item = neededItems[i];
+        const id = `${String(i + 1).padStart(2, "0")}_${slugify(item.name)}`;
+        const exists = items.some(existing => existing.id === id || existing.name === item.name);
+        if (!exists) {
+          await setDoc(doc(db, COLLECTION_ITEMS, id), {
+            ...item,
+            sortOrder: i + 1,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+        }
+      }
+    }
+
+    // JS does not have Python False; this wrapper avoids syntax mistakes in older edits.
+    async function seedDefaultItemsIfNeeded(snapshot) {
+      if (!snapshot.empty) return;
+      for (let i = 0; i < neededItems.length; i++) {
+        const item = neededItems[i];
+        const id = `${String(i + 1).padStart(2, "0")}_${slugify(item.name)}`;
+        await setDoc(doc(db, COLLECTION_ITEMS, id), {
+          ...item,
+          sortOrder: i + 1,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+      }
+    }
+
+    async function addMissingDefaultItems() {
+      for (let i = 0; i < neededItems.length; i++) {
+        const item = neededItems[i];
+        const exists = items.some(existing => existing.name === item.name);
+        if (!exists) {
+          const id = `${String(i + 1).padStart(2, "0")}_${slugify(item.name)}`;
+          await setDoc(doc(db, COLLECTION_ITEMS, id), {
+            ...item,
+            sortOrder: i + 1,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+        }
+      }
+      alert("已補齊預設品項");
+    }
+
+    async function adminAddItem() {
+      if (!isAdmin) return;
+
+      const category = el.adminCategory.value.trim();
+      const name = el.adminName.value.trim();
+      const spec = el.adminSpec.value.trim() || "-";
+      const targetQty = Number(el.adminQty.value || 1);
+      const priority = el.adminPriority.value;
+
+      if (!category || !name || !targetQty) {
+        alert("請填入類別、品項與數量");
+        return;
+      }
+
+      const sortOrder = Date.now();
+      await addDoc(collection(db, COLLECTION_ITEMS), {
+        category,
+        name,
+        spec,
+        targetQty,
+        priority,
+        sortOrder,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+
+      el.adminName.value = "";
+      el.adminSpec.value = "";
+      el.adminQty.value = 1;
+      alert("已新增品項");
+    }
+
+    window.adminUpdateItem = async (id, patch) => {
+      if (!isAdmin) return;
+      await updateDoc(doc(db, COLLECTION_ITEMS, id), {
+        ...patch,
+        updatedAt: serverTimestamp()
+      });
+    };
+
+    window.adminDeleteItem = async (id) => {
+      if (!isAdmin) return;
+      const item = items.find(i => i.id === id);
+      if (!confirm(`確定刪除「${item?.name || "此品項"}」嗎？`)) return;
+      await deleteDoc(doc(db, COLLECTION_ITEMS, id));
+    };
+
+    window.adminDeleteClaim = async (claimId) => {
+      if (!isAdmin) return;
+      if (!confirm("確定刪除此認領紀錄嗎？")) return;
+      await deleteDoc(doc(db, COLLECTION_CLAIMS, claimId));
+    };
+
+    function openAdmin() {
+      if (isAdmin) {
+        showPage(el.adminPage);
+        renderAdminTable();
+      } else {
+        showPage(el.adminLoginPage);
+      }
+    }
+
+    function adminLogin() {
+      if (el.adminPassword.value === ADMIN_PASSWORD) {
+        isAdmin = true;
+        sessionStorage.setItem("luckyTwinsAdmin", "yes");
+        el.adminPassword.value = "";
+        showPage(el.adminPage);
+        renderAdminTable();
+      } else {
+        alert("密碼錯誤");
+      }
+    }
+
+    function adminLogout() {
+      isAdmin = false;
+      sessionStorage.removeItem("luckyTwinsAdmin");
+      alert("已登出管理員");
+      showPage(el.listPage);
+      renderAll();
+    }
+
+    function startApp() {
+      try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+
+        const itemsQuery = query(collection(db, COLLECTION_ITEMS), orderBy("sortOrder"));
+        const claimsQuery = query(collection(db, COLLECTION_CLAIMS), orderBy("createdAt"));
+
+        onSnapshot(itemsQuery, async (snapshot) => {
+          await seedDefaultItemsIfNeeded(snapshot);
+          items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderAll();
+        }, (error) => {
+          console.error(error);
+          el.warning.style.display = "block";
+        });
+
+        onSnapshot(claimsQuery, (snapshot) => {
+          claims = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderAll();
+        }, (error) => {
+          console.error(error);
+          el.warning.style.display = "block";
+        });
+
+      } catch (err) {
+        console.error(err);
+        el.warning.style.display = "block";
+      }
+    }
+
+    el.search.addEventListener("input", renderList);
+    el.statusFilter.addEventListener("change", renderList);
+    el.backBtn.addEventListener("click", backToList);
+    el.submitClaimBtn.addEventListener("click", submitClaim);
+    el.adminBtn.addEventListener("click", openAdmin);
+    el.adminBackBtn.addEventListener("click", backToList);
+    el.adminLoginBtn.addEventListener("click", adminLogin);
+    el.adminPassword.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") adminLogin();
+    });
+    el.adminHomeBtn.addEventListener("click", backToList);
+    el.adminLogoutBtn.addEventListener("click", adminLogout);
+    el.adminAddBtn.addEventListener("click", adminAddItem);
+    el.resetSeedBtn.addEventListener("click", addMissingDefaultItems);
+
+    startApp();
+  </script>
+</body>
+</html>
